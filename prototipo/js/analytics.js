@@ -15,7 +15,7 @@
 // CONFIGURACIÓN - REEMPLAZA ESTOS VALORES
 // ============================================
 const ANALYTICS_CONFIG = {
-    GA4_MEASUREMENT_ID: 'G-XXXXXXXXXX',  // <-- Reemplaza con tu ID de GA4
+    GA4_MEASUREMENT_ID: 'G-10FSFRFMGT',  // ID de GA4 configurado
     GTM_ID: 'GTM-XXXXXXX',               // <-- Reemplaza con tu ID de GTM (opcional)
     DEBUG_MODE: false,                    // Cambiar a true para ver logs en consola
     TRACK_SCROLL_DEPTH: true,
