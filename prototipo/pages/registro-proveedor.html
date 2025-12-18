@@ -1083,6 +1083,7 @@
                 console.log('Enviando a Google Sheets...');
                 await sendToGoogleSheets('Proveedores', {
                     id: 'PRV-' + Date.now(),
+                    _skip: 'x',
                     tipo: formData.type === 'local' ? 'Local' : 'Servicio',
                     nombre_negocio: formData.businessName,
                     propietario: formData.ownerName,

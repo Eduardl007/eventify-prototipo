@@ -997,6 +997,7 @@
                     console.log('Enviando a Google Sheets...');
                     await sendToGoogleSheets('Leads', {
                         id: 'LEAD-' + Date.now(),
+                        _skip: 'x',
                         nombre: data.name,
                         email: data.email,
                         telefono: data.phone || '',
