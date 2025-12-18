@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Google Sheets - Eventify</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        .btn { background: #FF6B35; color: white; padding: 15px 30px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
+        .btn:hover { background: #E55A25; }
+        .log { background: #1a1a1a; color: #0f0; padding: 15px; border-radius: 8px; margin-top: 20px; font-family: monospace; white-space: pre-wrap; max-height: 400px; overflow-y: auto; }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+        h1 { color: #004E89; }
+    </style>
+</head>
+<body>
+    <h1>Test Google Sheets</h1>
+    <p>Prueba la conexion con Google Sheets</p>
+
+    <button class="btn" onclick="testLeads()">Probar hoja "Leads"</button>
+    <button class="btn" onclick="testProveedores()">Probar hoja "Proveedores"</button>
+    <button class="btn" onclick="testDirecto()">Test Directo (GET)</button>
+
+    <div class="log" id="log">Esperando prueba...</div>
+
+    <script>
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyV2hSTxoxVqai73KxP43C9FMT9kfWFYoLoZi7RQEXnkK875ba9LPV6IFSZRWbH8AKv/exec';
+
+        function log(msg, type = 'info') {
+            const logEl = document.getElementById('log');
+            const time = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : '';
+            logEl.innerHTML += `<span class="${className}">[${time}] ${msg}</span>\n`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        async function testDirecto() {
+            log('=== TEST DIRECTO (GET) ===');
+            log('URL: ' + GOOGLE_SHEETS_URL);
+
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL);
+                const data = await response.json();
+                log('Respuesta: ' + JSON.stringify(data, null, 2), 'success');
+            } catch (error) {
+                log('Error: ' + error.message, 'error');
+                log('Nota: Si ves error CORS, es normal. El POST deberia funcionar.', 'info');
+            }
+        }
+
+        async function testLeads() {
+            log('=== TEST HOJA LEADS ===');
+
+            const testData = {
+                sheet: 'Leads',
+                data: {
+                    id: 'TEST-' + Date.now(),
+                    nombre: 'Usuario Prueba',
+                    email: 'test@test.com',
+                    telefono: '999888777',
+                    tipo_usuario: 'organizador',
+                    fecha: new Date().toLocaleDateString('es-PE'),
+                    timestamp: new Date().toISOString(),
+                    source: 'test-page'
+                }
+            };
+
+            log('Datos a enviar: ' + JSON.stringify(testData, null, 2));
+
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(testData)
+                });
+
+                log('Status: ' + response.status);
+
+                try {
+                    const result = await response.text();
+                    log('Respuesta: ' + result, 'success');
+                } catch (e) {
+                    log('Enviado (sin respuesta visible por CORS)', 'success');
+                }
+
+                log('Revisa tu Google Sheet para ver si llego el registro', 'info');
+
+            } catch (error) {
+                log('Error: ' + error.message, 'error');
+            }
+        }
+
+        async function testProveedores() {
+            log('=== TEST HOJA PROVEEDORES ===');
+
+            const testData = {
+                sheet: 'Proveedores',
+                data: {
+                    id: 'PRV-TEST-' + Date.now(),
+                    tipo: 'Local',
+                    nombre_negocio: 'Salon Test',
+                    propietario: 'Juan Prueba',
+                    email: 'proveedor@test.com',
+                    telefono: '999111222',
+                    categoria: 'salon',
+                    direccion: 'Av. Test 123, Sullana',
+                    capacidad: '100',
+                    precio_base: '1500',
+                    tipos_evento: 'matrimonio, cumpleanos',
+                    descripcion: 'Local de prueba',
+                    fecha: new Date().toLocaleDateString('es-PE'),
+                    timestamp: new Date().toISOString()
+                }
+            };
+
+            log('Datos a enviar: ' + JSON.stringify(testData, null, 2));
+
+            try {
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(testData)
+                });
+
+                log('Status: ' + response.status);
+                log('Enviado. Revisa tu Google Sheet.', 'success');
+
+            } catch (error) {
+                log('Error: ' + error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -655,13 +655,15 @@
 
         async function sendToGoogleSheets(sheetName, data) {
             try {
+                const payload = JSON.stringify({ sheet: sheetName, data: data });
+
                 await fetch(GOOGLE_SHEETS_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sheet: sheetName, data: data })
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: payload
                 });
-                console.log('Datos enviados a Google Sheets');
+                console.log('Datos enviados a Google Sheets:', sheetName);
                 return true;
             } catch (error) {
                 console.error('Error Google Sheets:', error);
