@@ -950,85 +950,58 @@
             const form = this;
             const formData = new FormData(form);
             const submitBtn = form.querySelector('button[type="submit"]');
-
-            // Mostrar datos que se envian
-            console.log('Datos a enviar:');
-            for (let [key, value] of formData.entries()) {
-                console.log(`  ${key}: ${value}`);
-            }
+            const data = Object.fromEntries(formData);
 
             // Deshabilitar boton mientras envia
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
 
             try {
-                console.log('Enviando a Formspree...');
+                // 1. ENVIAR A GOOGLE SHEETS PRIMERO (siempre)
+                console.log('Enviando a Google Sheets...');
+                await sendToGoogleSheets('Leads', {
+                    id: 'LEAD-' + Date.now(),
+                    nombre: data.name,
+                    email: data.email,
+                    telefono: data.phone || '',
+                    interes: data.user_type,
+                    origen: 'landing-page',
+                    campania: 'lista-espera',
+                    fecha: new Date().toLocaleDateString('es-PE'),
+                    timestamp: new Date().toISOString()
+                });
+                console.log('Google Sheets OK');
 
-                // Enviar a Formspree
-                const response = await fetch('https://formspree.io/f/xqezzgbj', {
+                // 2. Guardar localmente
+                let waitlist = JSON.parse(localStorage.getItem('eventify_waitlist') || '[]');
+                waitlist.push({ ...data, timestamp: new Date().toISOString() });
+                localStorage.setItem('eventify_waitlist', JSON.stringify(waitlist));
+
+                // 3. Enviar a Formspree (opcional, no bloquea)
+                console.log('Enviando a Formspree...');
+                fetch('https://formspree.io/f/xqezzgbj', {
                     method: 'POST',
                     body: formData,
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
+                    headers: { 'Accept': 'application/json' }
+                }).then(r => console.log('Formspree:', r.ok)).catch(e => console.log('Formspree error:', e));
 
-                console.log('Status:', response.status);
-                console.log('OK:', response.ok);
+                // 4. Enviar email de bienvenida (opcional, no bloquea)
+                console.log('Enviando email...');
+                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                    to_name: data.name,
+                    to_email: data.email,
+                    user_type: data.user_type
+                }).then(() => console.log('Email OK')).catch(e => console.log('Email error:', e));
 
-                const result = await response.json();
-                console.log('Respuesta Formspree:', result);
+                // 5. Actualizar contador y mostrar exito
+                const counter = document.getElementById('waitlistCount');
+                counter.textContent = parseInt(counter.textContent) + 1;
+                form.style.display = 'none';
+                document.getElementById('successMessage').classList.add('show');
 
-                if (response.ok) {
-                    console.log('EXITO! Envio a Formspree completado');
-
-                    // Guardar localmente
-                    const data = Object.fromEntries(formData);
-                    let waitlist = JSON.parse(localStorage.getItem('eventify_waitlist') || '[]');
-                    waitlist.push({ ...data, timestamp: new Date().toISOString() });
-                    localStorage.setItem('eventify_waitlist', JSON.stringify(waitlist));
-
-                    // Enviar email de bienvenida con EmailJS
-                    console.log('Enviando email de bienvenida...');
-                    try {
-                        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                            to_name: data.name,
-                            to_email: data.email,
-                            user_type: data.user_type
-                        });
-                        console.log('Email de bienvenida enviado!');
-                    } catch (emailError) {
-                        console.error('Error al enviar email:', emailError);
-                    }
-
-                    // Enviar a Google Sheets
-                    console.log('Enviando a Google Sheets...');
-                    await sendToGoogleSheets('Leads', {
-                        id: 'LEAD-' + Date.now(),
-                        nombre: data.name,
-                        email: data.email,
-                        telefono: data.phone || '',
-                        interes: data.user_type,
-                        origen: 'landing-page',
-                        campania: 'lista-espera',
-                        fecha: new Date().toLocaleDateString('es-PE'),
-                        timestamp: new Date().toISOString()
-                    });
-
-                    // Actualizar contador
-                    const counter = document.getElementById('waitlistCount');
-                    counter.textContent = parseInt(counter.textContent) + 1;
-
-                    // Mostrar mensaje de exito
-                    form.style.display = 'none';
-                    document.getElementById('successMessage').classList.add('show');
-                } else {
-                    console.error('ERROR de Formspree:', result);
-                    throw new Error(result.error || 'Error en el envio');
-                }
             } catch (error) {
-                console.error('ERROR CATCH:', error);
-                alert('Hubo un error al registrarte. Por favor intenta de nuevo.\n\nDetalle: ' + error.message);
+                console.error('ERROR:', error);
+                alert('Hubo un error. Por favor intenta de nuevo.');
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-bell"></i> Avisame cuando lancen';
             }
