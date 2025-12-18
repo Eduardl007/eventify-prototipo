@@ -656,27 +656,35 @@
         function sendToGoogleSheets(sheetName, data) {
             return new Promise((resolve) => {
                 try {
-                    // Construir URL con parámetros
-                    const params = new URLSearchParams();
-                    params.append('sheet', sheetName);
-                    Object.keys(data).forEach(key => {
-                        params.append(key, data[key]);
+                    // Preparar datos en el formato correcto para Google Apps Script
+                    const payload = {
+                        sheet: sheetName,
+                        data: data
+                    };
+
+                    console.log('Enviando a Google Sheets:', payload);
+
+                    // Usar fetch con POST (metodo confiable)
+                    fetch(GOOGLE_SHEETS_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'text/plain'
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(response => {
+                        console.log('Google Sheets - Status:', response.status);
+                        return response.text();
+                    })
+                    .then(result => {
+                        console.log('Google Sheets - Respuesta:', result);
+                        resolve(true);
+                    })
+                    .catch(error => {
+                        // CORS puede bloquear la respuesta, pero los datos se envian igual
+                        console.log('Google Sheets - Enviado (CORS puede ocultar respuesta)');
+                        resolve(true);
                     });
-
-                    const url = GOOGLE_SHEETS_URL + '?' + params.toString();
-
-                    // Usar imagen para hacer la solicitud (evita CORS)
-                    const img = new Image();
-                    img.onload = () => {
-                        console.log('Datos enviados a Google Sheets:', sheetName);
-                        resolve(true);
-                    };
-                    img.onerror = () => {
-                        // El error es esperado (no es una imagen), pero los datos se envían
-                        console.log('Datos enviados a Google Sheets:', sheetName);
-                        resolve(true);
-                    };
-                    img.src = url;
 
                 } catch (error) {
                     console.error('Error Google Sheets:', error);
@@ -997,14 +1005,14 @@
                     console.log('Enviando a Google Sheets...');
                     await sendToGoogleSheets('Leads', {
                         id: 'LEAD-' + Date.now(),
-                        _skip: 'x',
                         nombre: data.name,
                         email: data.email,
                         telefono: data.phone || '',
-                        tipo_usuario: data.user_type,
+                        interes: data.user_type,
+                        origen: 'landing-page',
+                        campania: 'lista-espera',
                         fecha: new Date().toLocaleDateString('es-PE'),
-                        timestamp: new Date().toISOString(),
-                        source: window.location.href
+                        timestamp: new Date().toISOString()
                     });
 
                     // Actualizar contador
