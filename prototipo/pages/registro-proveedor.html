@@ -911,24 +911,22 @@
     </script>
 
     <!-- Google Sheets Integration -->
+    <iframe name="gsIframe" id="gsIframe" style="display:none;"></iframe>
     <script>
         const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwEb9IoNig2kaMJDGYegPQPqvM3H2K1XCXKdcVXLgeLR26Q6i0KqfL46Tw5h_kG31R5/exec';
 
         function sendToGoogleSheets(sheetName, data) {
             return new Promise((resolve) => {
                 try {
-                    const params = new URLSearchParams();
-                    params.append('sheet', sheetName);
-                    Object.keys(data).forEach(key => {
-                        params.append(key, data[key]);
-                    });
-
+                    const flatData = { sheet: sheetName, ...data };
+                    const params = new URLSearchParams(flatData);
                     const url = GOOGLE_SHEETS_URL + '?' + params.toString();
 
-                    const img = new Image();
-                    img.onload = () => resolve(true);
-                    img.onerror = () => resolve(true);
-                    img.src = url;
+                    const iframe = document.getElementById('gsIframe');
+                    iframe.src = url;
+                    iframe.onload = () => resolve(true);
+                    iframe.onerror = () => resolve(true);
+                    setTimeout(() => resolve(true), 5000);
 
                     console.log('Datos enviados a Google Sheets:', sheetName);
                 } catch (error) {
