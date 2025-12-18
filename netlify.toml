@@ -1,0 +1,15 @@
+# Configuracion de Netlify para Eventify Peru
+
+[build]
+  publish = "prototipo"
+
+# Redirects
+[[redirects]]
+  from = "/lista-espera"
+  to = "/landing.html"
+  status = 200
+
+[[redirects]]
+  from = "/waitlist"
+  to = "/landing.html"
+  status = 200
