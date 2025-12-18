@@ -1,0 +1,10 @@
+- Tip: Cada vez que hagas cambios locales, solo ejecuta:
+  git add -A && git commit -m "descripción del cambio" && git push
+  Y los cambios se reflejarán automáticamente en 1-2 minutos.
+
+
+- Cuando quieras ocultarlo:
+  1. Ve a tu repositorio en GitHub
+  2. Edita prototipo/index.html
+  3. Cambia la línea 9 de true a false
+  4. Guarda (commit)
