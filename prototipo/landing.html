@@ -653,22 +653,46 @@
     <script>
         const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyV2hSTxoxVqai73KxP43C9FMT9kfWFYoLoZi7RQEXnkK875ba9LPV6IFSZRWbH8AKv/exec';
 
-        async function sendToGoogleSheets(sheetName, data) {
-            try {
-                const payload = JSON.stringify({ sheet: sheetName, data: data });
+        function sendToGoogleSheets(sheetName, data) {
+            return new Promise((resolve) => {
+                try {
+                    // Crear iframe oculto para recibir respuesta
+                    const iframeName = 'gsFrame_' + Date.now();
+                    const iframe = document.createElement('iframe');
+                    iframe.name = iframeName;
+                    iframe.style.display = 'none';
+                    document.body.appendChild(iframe);
 
-                await fetch(GOOGLE_SHEETS_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain' },
-                    body: payload
-                });
-                console.log('Datos enviados a Google Sheets:', sheetName);
-                return true;
-            } catch (error) {
-                console.error('Error Google Sheets:', error);
-                return false;
-            }
+                    // Crear formulario oculto
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = GOOGLE_SHEETS_URL;
+                    form.target = iframeName;
+                    form.style.display = 'none';
+
+                    // Agregar datos como campo oculto
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'data';
+                    input.value = JSON.stringify({ sheet: sheetName, data: data });
+                    form.appendChild(input);
+
+                    document.body.appendChild(form);
+                    form.submit();
+
+                    // Limpiar después de enviar
+                    setTimeout(() => {
+                        document.body.removeChild(form);
+                        document.body.removeChild(iframe);
+                    }, 2000);
+
+                    console.log('Datos enviados a Google Sheets:', sheetName);
+                    resolve(true);
+                } catch (error) {
+                    console.error('Error Google Sheets:', error);
+                    resolve(false);
+                }
+            });
         }
     </script>
     <!-- Announcement Bar -->
