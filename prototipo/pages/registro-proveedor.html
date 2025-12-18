@@ -917,34 +917,20 @@
         function sendToGoogleSheets(sheetName, data) {
             return new Promise((resolve) => {
                 try {
-                    const iframeName = 'gsFrame_' + Date.now();
-                    const iframe = document.createElement('iframe');
-                    iframe.name = iframeName;
-                    iframe.style.display = 'none';
-                    document.body.appendChild(iframe);
+                    const params = new URLSearchParams();
+                    params.append('sheet', sheetName);
+                    Object.keys(data).forEach(key => {
+                        params.append(key, data[key]);
+                    });
 
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = GOOGLE_SHEETS_URL;
-                    form.target = iframeName;
-                    form.style.display = 'none';
+                    const url = GOOGLE_SHEETS_URL + '?' + params.toString();
 
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'data';
-                    input.value = JSON.stringify({ sheet: sheetName, data: data });
-                    form.appendChild(input);
-
-                    document.body.appendChild(form);
-                    form.submit();
-
-                    setTimeout(() => {
-                        document.body.removeChild(form);
-                        document.body.removeChild(iframe);
-                    }, 2000);
+                    const img = new Image();
+                    img.onload = () => resolve(true);
+                    img.onerror = () => resolve(true);
+                    img.src = url;
 
                     console.log('Datos enviados a Google Sheets:', sheetName);
-                    resolve(true);
                 } catch (error) {
                     console.error('Error Google Sheets:', error);
                     resolve(false);
