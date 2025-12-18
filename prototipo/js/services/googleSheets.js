@@ -15,11 +15,11 @@
  */
 
 const GOOGLE_SHEETS_CONFIG = {
-    // URL del Web App de Google Apps Script (reemplazar con tu URL)
-    webAppUrl: 'https://script.google.com/macros/s/TU_SCRIPT_ID/exec',
+    // URL del Web App de Google Apps Script
+    webAppUrl: 'https://script.google.com/macros/s/AKfycbyV2hSTxoxVqai73KxP43C9FMT9kfWFYoLoZi7RQEXnkK875ba9LPV6IFSZRWbH8AKv/exec',
 
-    // ID de la hoja de cálculo (obtener de la URL de tu Google Sheet)
-    spreadsheetId: 'TU_SPREADSHEET_ID',
+    // ID de la hoja de cálculo
+    spreadsheetId: '1lBAdWfHLugUOiBY0HFtdeCwd-SVGh8dsZ6q4xbQTFts',
 
     // Nombres de las hojas (pestañas)
     sheets: {

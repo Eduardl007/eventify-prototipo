@@ -907,6 +907,27 @@
     <!-- EmailJS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
+    <!-- Google Sheets Integration -->
+    <script>
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyV2hSTxoxVqai73KxP43C9FMT9kfWFYoLoZi7RQEXnkK875ba9LPV6IFSZRWbH8AKv/exec';
+
+        async function sendToGoogleSheets(sheetName, data) {
+            try {
+                await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sheet: sheetName, data: data })
+                });
+                console.log('Datos enviados a Google Sheets');
+                return true;
+            } catch (error) {
+                console.error('Error Google Sheets:', error);
+                return false;
+            }
+        }
+    </script>
+
     <!-- Analytics -->
     <script src="../js/analytics.js"></script>
 
@@ -1051,15 +1072,34 @@
                     }
                 }
 
-                // 3. Guardar en localStorage
+                // 3. Enviar a Google Sheets
+                console.log('Enviando a Google Sheets...');
+                await sendToGoogleSheets('Proveedores', {
+                    id: 'PRV-' + Date.now(),
+                    tipo: formData.type === 'local' ? 'Local' : 'Servicio',
+                    nombre_negocio: formData.businessName,
+                    propietario: formData.ownerName,
+                    email: formData.ownerEmail,
+                    telefono: formData.ownerPhone,
+                    categoria: formData.category,
+                    direccion: formData.address + ', ' + formData.district,
+                    capacidad: formData.capacity || '',
+                    precio_base: formData.basePrice || '',
+                    tipos_evento: formData.eventTypes.join(', '),
+                    descripcion: formData.description || '',
+                    fecha: new Date().toLocaleDateString('es-PE'),
+                    timestamp: new Date().toISOString()
+                });
+
+                // 4. Guardar en localStorage
                 let registros = JSON.parse(localStorage.getItem('eventify_proveedores') || '[]');
                 registros.push({ ...formData, timestamp: new Date().toISOString() });
                 localStorage.setItem('eventify_proveedores', JSON.stringify(registros));
 
-                // 4. Mostrar mensaje de exito
+                // 5. Mostrar mensaje de exito
                 showToast('success', 'Solicitud enviada!', 'Te contactaremos en menos de 24 horas');
 
-                // 5. Mostrar confirmacion y resetear formulario
+                // 6. Resetear formulario
                 setTimeout(() => {
                     document.getElementById('registrationForm').reset();
                     submitBtn.disabled = false;

@@ -648,6 +648,27 @@
 
         emailjs.init(EMAILJS_PUBLIC_KEY);
     </script>
+
+    <!-- Google Sheets Integration -->
+    <script>
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyV2hSTxoxVqai73KxP43C9FMT9kfWFYoLoZi7RQEXnkK875ba9LPV6IFSZRWbH8AKv/exec';
+
+        async function sendToGoogleSheets(sheetName, data) {
+            try {
+                await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sheet: sheetName, data: data })
+                });
+                console.log('Datos enviados a Google Sheets');
+                return true;
+            } catch (error) {
+                console.error('Error Google Sheets:', error);
+                return false;
+            }
+        }
+    </script>
     <!-- Announcement Bar -->
     <div class="announcement-bar">
         <span>NUEVO</span> Estamos construyendo algo increible para Sullana y Piura
@@ -954,8 +975,20 @@
                         console.log('Email de bienvenida enviado!');
                     } catch (emailError) {
                         console.error('Error al enviar email:', emailError);
-                        // No bloqueamos el flujo si falla el email
                     }
+
+                    // Enviar a Google Sheets
+                    console.log('Enviando a Google Sheets...');
+                    await sendToGoogleSheets('Leads', {
+                        id: 'LEAD-' + Date.now(),
+                        nombre: data.name,
+                        email: data.email,
+                        telefono: data.phone || '',
+                        tipo_usuario: data.user_type,
+                        fecha: new Date().toLocaleDateString('es-PE'),
+                        timestamp: new Date().toISOString(),
+                        source: window.location.href
+                    });
 
                     // Actualizar contador
                     const counter = document.getElementById('waitlistCount');
