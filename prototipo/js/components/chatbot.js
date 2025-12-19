@@ -189,9 +189,17 @@ class EventBot {
             // Determinar categoría de la consulta
             const category = this.categorizeQuery(message.toLowerCase());
 
-            // Registrar consulta en Google Sheets y Analytics
-            if (window.googleSheets) {
-                googleSheets.logChatbotQuery(message, response.text.substring(0, 200), category);
+            // Registrar consulta en Google Sheets
+            if (typeof sendToGoogleSheets === 'function') {
+                sendToGoogleSheets('Consultas', {
+                    id: 'CHT-' + Date.now(),
+                    consulta: message,
+                    respuesta: response.text.substring(0, 200).replace(/<[^>]*>/g, ''),
+                    categoria: category,
+                    fecha: new Date().toLocaleDateString('es-PE'),
+                    hora: new Date().toLocaleTimeString('es-PE'),
+                    timestamp: new Date().toISOString()
+                });
             }
             if (window.analytics) {
                 analytics.trackChatbotMessage(category);

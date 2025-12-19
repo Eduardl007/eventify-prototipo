@@ -82,13 +82,17 @@ function handleSearch(e) {
     const eventDate = document.getElementById('eventDate').value;
     const guestCount = document.getElementById('guestCount').value;
 
-    // Registrar búsqueda en Google Sheets y Analytics
-    if (window.googleSheets) {
-        googleSheets.logSearch({
-            eventType: eventType,
-            eventDate: eventDate,
-            guestCount: guestCount,
-            category: tabType
+    // Registrar búsqueda en Google Sheets
+    if (typeof sendToGoogleSheets === 'function') {
+        sendToGoogleSheets('Busquedas', {
+            id: 'BUSQ-' + Date.now(),
+            tipo_evento: eventType,
+            fecha_evento: eventDate,
+            invitados: guestCount,
+            categoria: tabType,
+            fecha: new Date().toLocaleDateString('es-PE'),
+            hora: new Date().toLocaleTimeString('es-PE'),
+            timestamp: new Date().toISOString()
         });
     }
     if (window.analytics) {

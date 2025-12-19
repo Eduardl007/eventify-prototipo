@@ -151,9 +151,16 @@ class Auth {
                 sessionStorage.set('eventify_user', this.currentUser);
             }
 
-            // Registrar login en Google Sheets y Analytics
-            if (window.googleSheets) {
-                googleSheets.logLogin(email, 'email');
+            // Registrar login en Google Sheets
+            if (typeof sendToGoogleSheets === 'function') {
+                sendToGoogleSheets('Logins', {
+                    id: 'LOGIN-' + Date.now(),
+                    email: email,
+                    metodo: 'email',
+                    fecha: new Date().toLocaleDateString('es-PE'),
+                    hora: new Date().toLocaleTimeString('es-PE'),
+                    timestamp: new Date().toISOString()
+                });
             }
             if (window.analytics) {
                 analytics.trackUserLogin('email');
@@ -228,14 +235,19 @@ class Auth {
 
             storage.set('eventify_user', this.currentUser);
 
-            // Registrar usuario en Google Sheets y Analytics
-            if (window.googleSheets) {
-                googleSheets.registerUser({
-                    name: name,
-                    lastname: lastname,
+            // Registrar usuario en Google Sheets
+            if (typeof sendToGoogleSheets === 'function') {
+                sendToGoogleSheets('Usuarios', {
+                    id: 'USR-' + Date.now(),
+                    nombre: name,
+                    apellido: lastname,
                     email: email,
-                    phone: phone,
-                    registrationType: 'email'
+                    telefono: phone,
+                    tipo_registro: 'email',
+                    estado: 'activo',
+                    fecha: new Date().toLocaleDateString('es-PE'),
+                    hora: new Date().toLocaleTimeString('es-PE'),
+                    timestamp: new Date().toISOString()
                 });
             }
             if (window.analytics) {
@@ -270,12 +282,15 @@ class Auth {
 
         storage.set('eventify_user', this.currentUser);
 
-        // Registrar en Google Sheets y Analytics
-        if (window.googleSheets) {
-            googleSheets.registerUser({
-                name: 'Usuario Google',
+        // Registrar en Google Sheets
+        if (typeof sendToGoogleSheets === 'function') {
+            sendToGoogleSheets('Logins', {
+                id: 'LOGIN-' + Date.now(),
                 email: 'usuario@gmail.com',
-                registrationType: 'google'
+                metodo: 'google',
+                fecha: new Date().toLocaleDateString('es-PE'),
+                hora: new Date().toLocaleTimeString('es-PE'),
+                timestamp: new Date().toISOString()
             });
         }
         if (window.analytics) {
@@ -303,12 +318,15 @@ class Auth {
 
         storage.set('eventify_user', this.currentUser);
 
-        // Registrar en Google Sheets y Analytics
-        if (window.googleSheets) {
-            googleSheets.registerUser({
-                name: 'Usuario Facebook',
+        // Registrar en Google Sheets
+        if (typeof sendToGoogleSheets === 'function') {
+            sendToGoogleSheets('Logins', {
+                id: 'LOGIN-' + Date.now(),
                 email: 'usuario@facebook.com',
-                registrationType: 'facebook'
+                metodo: 'facebook',
+                fecha: new Date().toLocaleDateString('es-PE'),
+                hora: new Date().toLocaleTimeString('es-PE'),
+                timestamp: new Date().toISOString()
             });
         }
         if (window.analytics) {
