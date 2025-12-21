@@ -16,7 +16,7 @@
 
 const GOOGLE_SHEETS_CONFIG = {
     // URL del Web App de Google Apps Script
-    webAppUrl: 'https://script.google.com/macros/s/AKfycbxWWH_SyHWtB4Zwdd3Vj92ysHfDJxYy7fFmt1KgB_L9SZ7xzxUQRDGogXD_cSLlyOfK/exec',
+    webAppUrl: 'https://script.google.com/macros/s/AKfycbx-Jyco4e_8mvT2stR39kU-vKEaDxvdd6FDosumVFW2ufMNwcrBLM3JEQGr44C5Ajl3/exec',
 
     // ID de la hoja de cálculo
     spreadsheetId: '1lBAdWfHLugUOiBY0HFtdeCwd-SVGh8dsZ6q4xbQTFts',
