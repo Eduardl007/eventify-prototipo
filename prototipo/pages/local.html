@@ -800,29 +800,50 @@
     </div>
 
     <!-- Google Sheets Integration -->
-    <iframe name="gsIframe" id="gsIframe" style="display:none;"></iframe>
     <script>
         const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxWWH_SyHWtB4Zwdd3Vj92ysHfDJxYy7fFmt1KgB_L9SZ7xzxUQRDGogXD_cSLlyOfK/exec';
 
-        function sendToGoogleSheets(sheetName, data) {
-            return new Promise((resolve) => {
+        async function sendToGoogleSheets(sheetName, data) {
+            console.log('Enviando a Google Sheets:', sheetName, data);
+
+            try {
+                // Método 1: Fetch con POST (preferido)
+                const response = await fetch(GOOGLE_SHEETS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sheet: sheetName,
+                        data: data
+                    })
+                });
+
+                console.log('Datos enviados correctamente a:', sheetName);
+                return true;
+
+            } catch (error) {
+                console.error('Error con fetch, intentando método alternativo:', error);
+
+                // Método 2: Fallback con imagen (más compatible)
                 try {
-                    const flatData = { sheet: sheetName, ...data };
-                    const params = new URLSearchParams(flatData);
-                    const url = GOOGLE_SHEETS_URL + '?' + params.toString();
+                    const params = new URLSearchParams({ sheet: sheetName, ...data });
+                    const img = new Image();
+                    img.src = GOOGLE_SHEETS_URL + '?' + params.toString();
+                    console.log('Enviado con método alternativo');
+                    return true;
+                } catch (e) {
+                    console.error('Error en fallback:', e);
 
-                    const iframe = document.getElementById('gsIframe');
-                    iframe.src = url;
-                    iframe.onload = () => resolve(true);
-                    iframe.onerror = () => resolve(true);
-                    setTimeout(() => resolve(true), 5000);
-
-                    console.log('Datos enviados a Google Sheets:', sheetName, data);
-                } catch (error) {
-                    console.error('Error Google Sheets:', error);
-                    resolve(false);
+                    // Guardar localmente para sincronizar después
+                    const pendingData = JSON.parse(localStorage.getItem('eventify_pending_' + sheetName) || '[]');
+                    pendingData.push({ ...data, _timestamp: new Date().toISOString() });
+                    localStorage.setItem('eventify_pending_' + sheetName, JSON.stringify(pendingData));
+                    console.log('Guardado localmente para sincronizar después');
+                    return false;
                 }
-            });
+            }
         }
     </script>
 
