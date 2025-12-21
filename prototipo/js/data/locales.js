@@ -3,6 +3,89 @@
    ======================================== */
 
 const LOCALES_DATA = [
+    // ============================================
+    // 🎯 LOCAL DE EJEMPLO - PERSONALIZA ESTE
+    // Copia esta estructura para agregar más locales
+    // ============================================
+    {
+        id: 0,
+        name: "📍 Salón de Eventos El Ejemplo",  // ← CAMBIAR: Nombre real del local
+        slug: "salon-ejemplo",                    // ← CAMBIAR: URL amigable (sin espacios, minúsculas)
+        category: "salon",                        // Opciones: salon, quinta, jardin, club, restaurante, hotel
+        location: {
+            address: "Av. San Martín 123",        // ← CAMBIAR: Dirección real
+            district: "Sullana",
+            city: "Piura",
+            coordinates: { lat: -4.9034, lng: -80.6879 }  // ← CAMBIAR: Coordenadas de Google Maps
+        },
+        capacity: {
+            min: 50,                              // ← CAMBIAR: Mínimo de personas
+            max: 150,                             // ← CAMBIAR: Máximo de personas
+            seated: 120,                          // ← CAMBIAR: Sentados
+            standing: 180                         // ← CAMBIAR: De pie
+        },
+        price: {
+            base: 800,                            // ← CAMBIAR: Precio base en soles
+            perHour: 100,                         // ← CAMBIAR: Por hora adicional
+            deposit: 300,                         // ← CAMBIAR: Depósito/adelanto
+            currency: "PEN"
+        },
+        rating: 4.5,                              // Rating inicial (1-5)
+        reviewsCount: 0,                          // Empezar en 0
+        images: [
+            "assets/images/locales/ejemplo-1.jpg",  // ← CAMBIAR: Agregar fotos reales
+            "assets/images/locales/ejemplo-2.jpg",
+            "assets/images/locales/ejemplo-3.jpg"
+        ],
+        icon: "🏛️",                              // Emoji del local
+        description: "Describe aquí tu local con todos los detalles: ambiente, decoración, qué lo hace especial, servicios incluidos, etc. Esta descripción aparece en la página de detalle.",
+        shortDescription: "Descripción corta para las tarjetas (máx 100 caracteres)",
+        amenities: [
+            // ← CAMBIAR: Solo incluir las que realmente tiene
+            { icon: "fa-parking", name: "Estacionamiento", description: "20 espacios" },
+            { icon: "fa-snowflake", name: "Aire Acondicionado", description: "Sistema central" },
+            { icon: "fa-wifi", name: "WiFi", description: "Gratis para invitados" },
+            { icon: "fa-music", name: "Equipo de Sonido", description: "Incluido" },
+            { icon: "fa-restroom", name: "Baños", description: "Separados damas/caballeros" }
+            // Otros: fa-utensils (cocina), fa-swimming-pool (piscina), fa-tree (jardín),
+            // fa-child (juegos infantiles), fa-fire (parrilla), fa-video (proyector)
+        ],
+        eventTypes: ["cumpleanos", "matrimonio", "quinceanos", "corporativo", "bautizo"],
+        availability: {
+            monday: { available: false, hours: "" },     // ← CAMBIAR: Días que atiende
+            tuesday: { available: true, hours: "16:00-23:00" },
+            wednesday: { available: true, hours: "16:00-23:00" },
+            thursday: { available: true, hours: "16:00-23:00" },
+            friday: { available: true, hours: "16:00-02:00" },
+            saturday: { available: true, hours: "10:00-02:00" },
+            sunday: { available: true, hours: "10:00-22:00" }
+        },
+        blockedDates: [],                         // Fechas ya reservadas: ["2025-01-15", "2025-02-14"]
+        policies: {
+            cancellation: "Cancelación con 7 días de anticipación",
+            deposit: "50% al reservar, 50% una semana antes del evento",
+            rules: ["No fumar en interiores", "Horario máximo según disponibilidad"]
+        },
+        contact: {
+            phone: "+51 900 000 000",             // ← CAMBIAR: Teléfono real del proveedor
+            whatsapp: "+51 900 000 000",          // ← CAMBIAR: WhatsApp real (importante!)
+            email: "contacto@ejemplo.com"         // ← CAMBIAR: Email real
+        },
+        verified: false,                          // true cuando verificas al proveedor
+        featured: true,                           // true para destacarlo en home
+        badges: [],                               // Agregar: "Verificado", "Nuevo", "Popular"
+        createdAt: "2025-01-01",
+        owner: {
+            id: 1,
+            name: "Nombre del Propietario",       // ← CAMBIAR: Nombre real
+            avatar: "NP",                         // ← CAMBIAR: Iniciales
+            responseRate: 90,
+            responseTime: "< 2 horas"
+        }
+    },
+    // ============================================
+    // FIN DEL EJEMPLO - Los siguientes son demos
+    // ============================================
     {
         id: 1,
         name: "Salón Los Jardines Premium",

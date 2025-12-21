@@ -707,7 +707,124 @@
         </div>
 
         <div class="toast-container" id="toastContainer"></div>
+
+        <!-- Modal de Solicitud de Reserva -->
+        <div class="modal" id="bookingModal">
+            <div class="modal-overlay" onclick="closeBookingModal()"></div>
+            <div class="modal-content auth-modal">
+                <button class="modal-close" onclick="closeBookingModal()" aria-label="Cerrar"><i class="fas fa-times"></i></button>
+                <div class="auth-header">
+                    <h2><i class="fas fa-calendar-check" style="color: var(--primary); margin-right: 8px;"></i>Solicitar Reserva</h2>
+                    <p id="bookingModalSubtitle">Completa tus datos y te contactaremos en menos de 24 horas</p>
+                </div>
+                <form id="bookingRequestForm" onsubmit="submitBookingRequest(event)">
+                    <div class="booking-summary" style="background: var(--gray-50); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+                        <h4 id="modalLocalName" style="margin: 0 0 8px 0; color: var(--gray-900);"></h4>
+                        <div style="display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; color: var(--gray-600);">
+                            <span><i class="fas fa-calendar"></i> <span id="modalDate"></span></span>
+                            <span><i class="fas fa-users"></i> <span id="modalGuests"></span> invitados</span>
+                            <span><i class="fas fa-tag"></i> <span id="modalEventType"></span></span>
+                        </div>
+                        <div style="margin-top: 12px; font-size: 18px; font-weight: 600; color: var(--primary);">
+                            Total estimado: <span id="modalTotal"></span>
+                        </div>
+                    </div>
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="bookingName">Nombre completo *</label>
+                            <input type="text" id="bookingName" placeholder="Tu nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bookingPhone">Teléfono / WhatsApp *</label>
+                            <input type="tel" id="bookingPhone" placeholder="999 888 777" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookingEmail">Correo electrónico *</label>
+                        <div class="input-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="bookingEmail" placeholder="tu@correo.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="bookingMessage">Mensaje adicional (opcional)</label>
+                        <textarea id="bookingMessage" rows="3" placeholder="¿Tienes alguna pregunta o requerimiento especial?" style="width: 100%; padding: 12px; border: 1px solid var(--gray-200); border-radius: 8px; resize: vertical;"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitBookingBtn">
+                        <i class="fas fa-paper-plane"></i> Enviar Solicitud de Reserva
+                    </button>
+                    <p style="text-align: center; margin-top: 12px; font-size: 13px; color: var(--gray-500);">
+                        <i class="fas fa-shield-alt"></i> Tus datos están protegidos. Te contactaremos pronto.
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal de Solicitar Visita -->
+        <div class="modal" id="visitModal">
+            <div class="modal-overlay" onclick="closeVisitModal()"></div>
+            <div class="modal-content auth-modal">
+                <button class="modal-close" onclick="closeVisitModal()" aria-label="Cerrar"><i class="fas fa-times"></i></button>
+                <div class="auth-header">
+                    <h2><i class="fas fa-eye" style="color: var(--primary); margin-right: 8px;"></i>Solicitar Visita</h2>
+                    <p>Agenda una visita para conocer el local en persona</p>
+                </div>
+                <form id="visitRequestForm" onsubmit="submitVisitRequest(event)">
+                    <div class="form-row-2">
+                        <div class="form-group">
+                            <label for="visitName">Nombre completo *</label>
+                            <input type="text" id="visitName" placeholder="Tu nombre" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="visitPhone">Teléfono / WhatsApp *</label>
+                            <input type="tel" id="visitPhone" placeholder="999 888 777" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="visitEmail">Correo electrónico *</label>
+                        <div class="input-icon">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="visitEmail" placeholder="tu@correo.com" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="visitPreferredDate">Fecha preferida para visita</label>
+                        <input type="date" id="visitPreferredDate" style="width: 100%; padding: 12px; border: 1px solid var(--gray-200); border-radius: 8px;">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitVisitBtn">
+                        <i class="fas fa-calendar-plus"></i> Solicitar Visita
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
+
+    <!-- Google Sheets Integration -->
+    <iframe name="gsIframe" id="gsIframe" style="display:none;"></iframe>
+    <script>
+        const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbxWWH_SyHWtB4Zwdd3Vj92ysHfDJxYy7fFmt1KgB_L9SZ7xzxUQRDGogXD_cSLlyOfK/exec';
+
+        function sendToGoogleSheets(sheetName, data) {
+            return new Promise((resolve) => {
+                try {
+                    const flatData = { sheet: sheetName, ...data };
+                    const params = new URLSearchParams(flatData);
+                    const url = GOOGLE_SHEETS_URL + '?' + params.toString();
+
+                    const iframe = document.getElementById('gsIframe');
+                    iframe.src = url;
+                    iframe.onload = () => resolve(true);
+                    iframe.onerror = () => resolve(true);
+                    setTimeout(() => resolve(true), 5000);
+
+                    console.log('Datos enviados a Google Sheets:', sheetName, data);
+                } catch (error) {
+                    console.error('Error Google Sheets:', error);
+                    resolve(false);
+                }
+            });
+        }
+    </script>
 
     <!-- Analytics -->
     <script src="../js/analytics.js"></script>
@@ -1038,26 +1155,100 @@
             `;
         }
 
+        // Variables para almacenar datos de reserva temporalmente
+        let pendingBookingData = {};
+
         function handleBooking(e) {
             e.preventDefault();
-
-            if (!window.auth?.isLoggedIn()) {
-                showToast('info', 'Inicia sesión', 'Debes iniciar sesión para reservar');
-                openAuthModal('login');
-                return;
-            }
 
             const date = document.getElementById('bookingDate').value;
             const eventType = document.getElementById('bookingEventType').value;
             const guests = document.getElementById('bookingGuests').value;
 
-            // Simulate booking process
-            showToast('success', '¡Reserva iniciada!', `Procesando reserva para ${formatDate(date, 'long')}`);
+            if (!date) {
+                showToast('error', 'Fecha requerida', 'Selecciona una fecha para tu evento');
+                return;
+            }
 
-            // In a real app, this would navigate to checkout
-            setTimeout(() => {
-                alert(`PROTOTIPO: En la versión final, aquí se procesaría el pago.\n\nDetalles de reserva:\n- Local: ${currentLocale.name}\n- Fecha: ${formatDate(date, 'long')}\n- Evento: ${EVENT_TYPES[eventType]?.name || eventType}\n- Invitados: ${guests}\n- Total: ${formatPrice(currentLocale.price.base + currentLocale.price.deposit + currentLocale.price.base * 0.12)}`);
-            }, 1000);
+            // Guardar datos temporalmente
+            const total = currentLocale.price.base + currentLocale.price.deposit + (currentLocale.price.base * 0.12);
+            pendingBookingData = {
+                local: currentLocale.name,
+                localSlug: currentLocale.slug,
+                fecha: date,
+                fechaFormateada: formatDate(date, 'long'),
+                tipoEvento: eventType,
+                tipoEventoNombre: EVENT_TYPES[eventType]?.name || eventType,
+                invitados: guests,
+                precioBase: currentLocale.price.base,
+                deposito: currentLocale.price.deposit,
+                total: total
+            };
+
+            // Llenar el modal con los datos
+            document.getElementById('modalLocalName').textContent = currentLocale.name;
+            document.getElementById('modalDate').textContent = formatDate(date, 'long');
+            document.getElementById('modalGuests').textContent = guests;
+            document.getElementById('modalEventType').textContent = EVENT_TYPES[eventType]?.name || eventType;
+            document.getElementById('modalTotal').textContent = formatPrice(total);
+
+            // Abrir modal
+            openBookingModal();
+        }
+
+        function openBookingModal() {
+            document.getElementById('bookingModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeBookingModal() {
+            document.getElementById('bookingModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        async function submitBookingRequest(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('submitBookingBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+            btn.disabled = true;
+
+            const formData = {
+                id: 'RES-' + Date.now(),
+                nombre: document.getElementById('bookingName').value,
+                telefono: document.getElementById('bookingPhone').value,
+                contacto: document.getElementById('bookingEmail').value,
+                mensaje: document.getElementById('bookingMessage').value || '',
+                local: pendingBookingData.local,
+                localSlug: pendingBookingData.localSlug,
+                fechaEvento: pendingBookingData.fecha,
+                tipoEvento: pendingBookingData.tipoEventoNombre,
+                invitados: pendingBookingData.invitados,
+                precioEstimado: pendingBookingData.total,
+                estado: 'pendiente',
+                origen: 'web',
+                fecha: new Date().toLocaleDateString('es-PE'),
+                hora: new Date().toLocaleTimeString('es-PE'),
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                await sendToGoogleSheets('Reservas', formData);
+
+                closeBookingModal();
+                showToast('success', '¡Solicitud enviada!', 'Te contactaremos en menos de 24 horas para confirmar tu reserva');
+
+                // Limpiar formulario
+                document.getElementById('bookingRequestForm').reset();
+
+            } catch (error) {
+                console.error('Error al enviar:', error);
+                showToast('error', 'Error', 'Hubo un problema. Intenta de nuevo o contáctanos por WhatsApp');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
 
         function contactOwner() {
@@ -1066,8 +1257,59 @@
             window.open(url, '_blank');
         }
 
+        function openVisitModal() {
+            document.getElementById('visitModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVisitModal() {
+            document.getElementById('visitModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
         function requestVisit() {
-            showToast('success', 'Solicitud enviada', 'Te contactaremos pronto para coordinar la visita');
+            openVisitModal();
+        }
+
+        async function submitVisitRequest(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('submitVisitBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+            btn.disabled = true;
+
+            const formData = {
+                id: 'VIS-' + Date.now(),
+                nombre: document.getElementById('visitName').value,
+                telefono: document.getElementById('visitPhone').value,
+                contacto: document.getElementById('visitEmail').value,
+                fechaPreferida: document.getElementById('visitPreferredDate').value || 'Por definir',
+                local: currentLocale.name,
+                localSlug: currentLocale.slug,
+                tipoSolicitud: 'visita',
+                estado: 'pendiente',
+                fecha: new Date().toLocaleDateString('es-PE'),
+                hora: new Date().toLocaleTimeString('es-PE'),
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                await sendToGoogleSheets('Leads', formData);
+
+                closeVisitModal();
+                showToast('success', '¡Solicitud enviada!', 'Te contactaremos pronto para coordinar tu visita');
+
+                // Limpiar formulario
+                document.getElementById('visitRequestForm').reset();
+
+            } catch (error) {
+                console.error('Error al enviar:', error);
+                showToast('error', 'Error', 'Hubo un problema. Intenta de nuevo');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
 
         function shareLocal() {
