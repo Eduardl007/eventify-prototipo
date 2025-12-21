@@ -799,6 +799,15 @@
         </div>
     </div>
 
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script>
+        const EMAILJS_PUBLIC_KEY = '0dYuscUBKL8b-TRsX';
+        const EMAILJS_SERVICE_ID = 'service_ealwt3e';
+        const EMAILJS_TEMPLATE_ID = 'template_x0x0gnu';
+        emailjs.init(EMAILJS_PUBLIC_KEY);
+    </script>
+
     <!-- Google Sheets Integration -->
     <script>
         const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbx-Jyco4e_8mvT2stR39kU-vKEaDxvdd6FDosumVFW2ufMNwcrBLM3JEQGr44C5Ajl3/exec';
@@ -1300,12 +1309,21 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
             btn.disabled = true;
 
+            const userEmail = document.getElementById('visitEmail').value;
+            const userName = document.getElementById('visitName').value;
+            const userPhone = document.getElementById('visitPhone').value;
+            const preferredDate = document.getElementById('visitPreferredDate').value || 'Por definir';
+
             const formData = {
                 id: 'VIS-' + Date.now(),
-                nombre: document.getElementById('visitName').value,
-                telefono: document.getElementById('visitPhone').value,
-                contacto: document.getElementById('visitEmail').value,
-                fechaPreferida: document.getElementById('visitPreferredDate').value || 'Por definir',
+                nombre: userName,
+                telefono: userPhone,
+                contacto: userEmail,
+                email: userEmail,
+                interes: 'Solicitud de visita - ' + currentLocale.name,
+                origen: 'Pagina de local',
+                campania: 'visita_local',
+                fechaPreferida: preferredDate,
                 local: currentLocale.name,
                 localSlug: currentLocale.slug,
                 tipoSolicitud: 'visita',
@@ -1316,7 +1334,36 @@
             };
 
             try {
+                // 1. Enviar a Google Sheets
                 await sendToGoogleSheets('Leads', formData);
+
+                // 2. Enviar correo de confirmacion al usuario
+                try {
+                    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                        to_email: userEmail,
+                        to_name: userName,
+                        from_name: 'Eventify Peru',
+                        subject: 'Solicitud de visita recibida - ' + currentLocale.name,
+                        message: `Hola ${userName},\n\nHemos recibido tu solicitud de visita para el local "${currentLocale.name}".\n\nFecha preferida: ${preferredDate}\nTelefono: ${userPhone}\n\nNos pondremos en contacto contigo pronto para coordinar la visita.\n\nGracias por confiar en Eventify Peru.`
+                    });
+                    console.log('Correo de confirmacion enviado al usuario');
+                } catch (emailError) {
+                    console.warn('No se pudo enviar correo al usuario:', emailError);
+                }
+
+                // 3. Enviar notificacion al administrador
+                try {
+                    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                        to_email: 'eventifyperu@gmail.com',
+                        to_name: 'Eventify Peru',
+                        from_name: userName,
+                        subject: 'Nueva solicitud de visita - ' + currentLocale.name,
+                        message: `Nueva solicitud de visita:\n\nLocal: ${currentLocale.name}\nNombre: ${userName}\nEmail: ${userEmail}\nTelefono: ${userPhone}\nFecha preferida: ${preferredDate}\n\nFecha de solicitud: ${formData.fecha} ${formData.hora}`
+                    });
+                    console.log('Notificacion enviada al administrador');
+                } catch (emailError) {
+                    console.warn('No se pudo enviar notificacion al admin:', emailError);
+                }
 
                 closeVisitModal();
                 showToast('success', '¡Solicitud enviada!', 'Te contactaremos pronto para coordinar tu visita');
